@@ -3,7 +3,16 @@ var points = [];
 var showPoint = true;
 var showPolygon = true;
 var showCurve = true;
+var evaluations = 100;
+var pathsPolygonG = [];
+var pathsCurveG = [];
 //var paths = [];
+
+stage.on('message:receiveEvaluation', function(data) {
+	evaluations = data.data;
+	calculateCasteljau();
+	getDraw();
+})
 
 stage.on('message:receivePointBox', function(data) {
 	showPoint = data.data;
@@ -31,7 +40,7 @@ function getCasteljau(r, i, t) {
 
 function casteljau() {
 	var p = [];
-	for(var t = 0; t <= 1; t += 0.01) {
+	for(var t = 0; t <= 1; t += 1/evaluations) {
 		var aux = getCasteljau(points.length-1, 0, t);
 		p.push(aux.x);
 		p.push(aux.y);
@@ -40,8 +49,6 @@ function casteljau() {
 				.moveTo(0,0)
 				.stroke('blue', 1);
 }
-var pathsPolygonG = [];
-var pathsCurveG = [];
 
 function getDraw() {
 	var stageObjects = [];
@@ -63,28 +70,40 @@ function getDraw() {
 	stage.children(stageObjects);
 }
 
+function calculateCasteljau() {
+	pathsCurveG = [];
+	if(points.length > 2) {
+		var curve = casteljau();
+		//console.log("oi");
+		pathsCurveG.push(curve);
+	}
+}
+
 stage.on('click', function(e) {
-	circles.push(new Circle(e.x, e.y, 4)
-					.addTo(stage)
-					.attr('fillColor', 'gray'));
-	points.push(new Point(e.x, e.y));
-	
+	var delet = false;
+	for(var i = 0; i < circles.length; i++) {
+		if(e.target == circles[i]) {
+			circles.splice(i, 1);
+			points.splice(i, 1);
+			delet = true;
+		}
+	}
+	if(!delet) {
+		circles.push(new Circle(e.x, e.y, 4)
+						.addTo(stage)
+						.attr('fillColor', 'gray'));
+		points.push(new Point(e.x, e.y));
+	}
 	if(circles.length > 1) {
 		var pathsPolygon = [];
-		var pathsCurve = [];
 		for(var i = 0; i < circles.length-1; i++) {
 			pathsPolygon.push(new Path([['moveTo', circles[i].attr('x'), circles[i].attr('y')],
 			 					['lineTo', circles[i+1].attr('x'), circles[i+1].attr('y')]
 			 					]).stroke('gray', 1));
 		}
 
-		if(points.length > 2) {
-			var curve = casteljau();
-			//console.log("oi");
-			pathsCurve.push(curve);
-		}
 		pathsPolygonG = pathsPolygon;
-		pathsCurveG = pathsCurve;
+		calculateCasteljau();
 		getDraw();
 	}
 });

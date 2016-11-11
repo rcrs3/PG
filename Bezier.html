@@ -9,6 +9,9 @@
     <input id="polygon" type="checkbox" checked onclick="selectPolygonBox()"/>
     <label>| Pontos da curva </label> 
     <input id="curve" type="checkbox" checked onclick="selectCurveBox()"/>
+    <label> | </label>
+    <input id="evaluation" type = "number" min = "0" max = "10000"/>
+    <button onclick="selectEvaluation()">Avaliações</button>
   </head>
   <body>
     <div id="main"></div>
@@ -18,6 +21,14 @@
       width: $(window).width(),
       height: $(window).height()
       });
+      
+      function selectEvaluation() {
+        var eval = document.getElementById('evaluation').value
+        m.sendMessage('receiveEvaluation', {
+          data: eval
+        })
+      }
+
       function selectPointBox() {
         var point_b = document.getElementById('control').checked
         m.sendMessage('receivePointBox', {
