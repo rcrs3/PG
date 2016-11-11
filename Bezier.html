@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="frames/bonsai-0.4.1.min.js" charset="utf-8"></script>
+    <script src="frames/jquery-3.1.1.min.js" charset="utf-8"></script>
+    <label>Pontos de controle </label>
+    <input id="control" type="checkbox" checked onclick="selectPointBox()"/>
+    <label>| Poligonal de controle </label>
+    <input id="polygon" type="checkbox" checked onclick="selectPolygonBox()"/>
+    <label>| Pontos da curva </label> 
+    <input id="curve" type="checkbox" checked onclick="selectCurveBox()"/>
+  </head>
+  <body>
+    <div id="main"></div>
+    <script>
+      var m = bonsai.run(document.getElementById('main'), {
+      url: 'js/casteljau.js',
+      width: $(window).width(),
+      height: $(window).height()
+      });
+      function selectPointBox() {
+        var point_b = document.getElementById('control').checked
+        m.sendMessage('receivePointBox', {
+          data: point_b
+        });
+      }
+
+      function selectPolygonBox() {
+        var polygon_b = document.getElementById('polygon').checked
+        m.sendMessage('receivePolygonBox', {
+          data: polygon_b
+        });
+      }
+
+      function selectCurveBox() {
+        var curve_b = document.getElementById('curve').checked
+        m.sendMessage('receiveCurveBox', {
+          data: curve_b
+        });
+      }
+
+    </script>
+  </body>
+</html>
