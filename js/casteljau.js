@@ -29,25 +29,29 @@ stage.on('message:receiveCurveBox', function(data) {
 	getDraw();
 })
 
-function getCasteljau(r, i, t) {
-	if(r == 0) return points[i];
-	
-	var p1; var p2;
-	p1 = getCasteljau(r-1, i, t);
-	p2 = getCasteljau(r-1, i+1, t);
-	return new Point(((1-t)*p1.x) + (t*p2.x), ((1-t)*p1.y) + (t*p2.y));
+function interpolation(t, p1, p2){
+	return new Point(t*p1.x + (1-t)*p2.x, t*p1.y + (1-t)*p2.y);
 }
 
-function casteljau() {
-	var p = [];
-	for(var t = 0; t <= 1; t += 1/evaluations) {
-		var aux = getCasteljau(points.length-1, 0, t);
-		p.push(aux.x);
-		p.push(aux.y);
-	}
-	return new Path(p)
-				.moveTo(0,0)
-				.stroke('blue', 1);
+function getCasteljau(){
+  var curve = [];
+  for (var t = 0; t <= 1; t+=1/evaluations) {
+    var aux = [];
+    aux = points;
+    while (aux.length>1) {
+      var len = aux.length;
+      var aux2 = [];
+      for (var i = 0; i < len-1; i++) {
+        var newP = interpolation(t, aux[i], aux[i+1]);
+        aux2.push(newP);
+      }
+      aux = aux2;
+    }
+    curve.push(aux[0].x);
+    curve.push(aux[0].y);
+  }
+  return new Path(curve).moveTo(0,0)
+  						.stroke('blue', 1);
 }
 
 function getDraw() {
@@ -73,7 +77,7 @@ function getDraw() {
 function calculateCasteljau() {
 	pathsCurveG = [];
 	if(points.length > 2) {
-		var curve = casteljau();
+		var curve = getCasteljau();
 		//console.log("oi");
 		pathsCurveG.push(curve);
 	}
@@ -107,3 +111,14 @@ stage.on('click', function(e) {
 		getDraw();
 	}
 });
+
+stage.on('pointerup', function(e) {
+	for(var i = 0; i < circles.length; i++) {
+		if(e.target == circles[i]) {
+			circles[i].x = e.x;
+			circles[i].y = e.y;
+			points[i].x = e.x;
+			points[i].y = e.y;
+		}
+	}
+})
