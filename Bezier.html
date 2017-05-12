@@ -7,11 +7,16 @@
     <input id="control" type="checkbox" checked onclick="selectPointBox()"/>
     <label>| Poligonal de controle </label>
     <input id="polygon" type="checkbox" checked onclick="selectPolygonBox()"/>
-    <label>| Pontos da curva </label> 
+    <label>| Pontos da curva </label>
     <input id="curve" type="checkbox" checked onclick="selectCurveBox()"/>
     <label> | </label>
-    <input id="evaluation" type = "number" min = "0" max = "10000"/>
-    <button onclick="selectEvaluation()">Avaliações</button>
+    <input id="evaluation" type = "number" value = "500" min = "0" max = "10000"/>
+    <button onclick="selectEvaluation()">Mudar Número de Avaliações</button>
+    <label> | </label>
+    <button onclick="selectElevate()">Elevar Grau</button>
+    <br />
+    <label>Clique para adicionar um ponto | Clique e arraste em um ponto para movê-lo</label>
+    <label> | Dê um clique-duplo em um ponto para removê-lo</label>
   </head>
   <body>
     <div id="main"></div>
@@ -21,7 +26,12 @@
       width: $(window).width(),
       height: $(window).height()
       });
-      
+
+      function selectElevate() {
+        m.sendMessage('ElevateDegree', {
+        })
+      }
+
       function selectEvaluation() {
         var eval = document.getElementById('evaluation').value
         m.sendMessage('receiveEvaluation', {
